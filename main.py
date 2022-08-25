@@ -490,12 +490,12 @@ def predict_vid(vid):
 
     if ((averageFixationLengthMS > 200) and (averageFixationLengthMS < 325)):
         print('YOU ARE PROBABLY NOT DYSLEXIC')
-        return {"result": 'PROBABLY NOT DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":image_64_encode}
+        return {"result": 'PROBABLY NOT DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":str(image_64_encode)}
     if ((averageFixationLengthMS >= 325) and (averageFixationLengthMS <= 370)):
         print('YOU ARE PROBABLY DYSLEXIC')
-        return {"result": 'PROBABLY DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":image_64_encode}
+        return {"result": 'PROBABLY DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":str(image_64_encode)}
     if((averageFixationLengthMS > 370)):
-        return {"result": 'High noise in video',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":image_64_encode}
+        return {"result": 'High noise in video',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":str(image_64_encode)}
 
 
 

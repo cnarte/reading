@@ -6,6 +6,8 @@ import urllib.request
 import os
 import json
 
+import ocr
+
 from main import predict_vid
 app = FastAPI()
 
@@ -41,7 +43,7 @@ async def reading(info : Request):
         
         urllib.request.urlretrieve(link, 'video_name.mp4') 
         
-        res = await predict_vid('video_name.mp4')
+        res = predict_vid('video_name.mp4')
         
         with open("results/"+uid+'.json', 'w') as fp:
             json.dump(res, fp)
@@ -54,17 +56,31 @@ async def reading(info : Request):
 
 @app.get("/reading_test_result")
 async def reading_result(info : Request):
-    id = await info.json()
-    uid = dict(id)["uuid"]
-    dirs =  os.listdir("results")
-    path = uid+".json"
-    # dirs = [x.split(".")[0] for x in dirs]
-    print(dirs)
-    if(path in dirs):
-        p = os.path.join("results",path)
-        f = open(p)
-        
-        res = json.load(f)
-        return {"results": res}
-    else:
-        return{"results":"not yet generated"}
+    try:
+        id = await info.json()
+        uid = dict(id)["uuid"]
+        dirs =  os.listdir("results")
+        path = uid+".json"
+        # dirs = [x.split(".")[0] for x in dirs]
+        print(dirs)
+        if(path in dirs):
+            p = os.path.join("results",path)
+            f = open(p)
+            res = json.load(f)
+            return {"results": res}
+        else:
+            return{"results":"not yet generated"}
+    except Exception as e:
+        print(e)
+        return {"error":e}
+
+@app.get("/ocr_test_result")
+async def ocr_result(info : Request):
+    try:
+        id = await info.json()
+        url = dict(id)["link"]
+        a,b = ocr.make_pred(url)
+        return {"correct":a,"out_of":b}
+    except Exception as e:
+        print(e)
+        return {"error":e}
