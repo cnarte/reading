@@ -1,8 +1,10 @@
+from unittest import result
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
 import urllib.request
 import os
+import json
 
 from main import predict_vid
 app = FastAPI()
@@ -40,7 +42,7 @@ async def reading(info : Request):
         urllib.request.urlretrieve(link, 'video_name.mp4') 
         
         res = await predict_vid('video_name.mp4')
-        import json
+        
         with open("results/"+uid+'.json', 'w') as fp:
             json.dump(res, fp)
         if os.path.exists('video_name.mp4'):
@@ -53,3 +55,16 @@ async def reading(info : Request):
 @app.get("/reading_test_result")
 async def reading_result(info : Request):
     id = await info.json()
+    uid = dict(id)["uuid"]
+    dirs =  os.listdir("results")
+    path = uid+".json"
+    # dirs = [x.split(".")[0] for x in dirs]
+    print(dirs)
+    if(path in dirs):
+        p = os.path.join("results",path)
+        f = open(p)
+        
+        res = json.load(f)
+        return {"results": res}
+    else:
+        return{"results":"not yet generated"}
