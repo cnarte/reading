@@ -33,10 +33,16 @@ async def reading(info : Request):
     req_info = await info.json()
     print(dict(req_info))
     try:
+        
         link =dict(req_info)["link"] 
+        uid = dict(req_info)["uuid"]
         
         urllib.request.urlretrieve(link, 'video_name.mp4') 
+        
         res = await predict_vid('video_name.mp4')
+        import json
+        with open("results/"+uid+'.json', 'w') as fp:
+            json.dump(res, fp)
         if os.path.exists('video_name.mp4'):
             os.remove('video_name.mp4') # one file at a time
         return {"message": "success", "link_recived":link}
@@ -44,4 +50,6 @@ async def reading(info : Request):
         print("problem", e)
         return {"message": "Please check vedio again"}
 
-
+@app.get("/reading_test_result")
+async def reading_result(info : Request):
+    id = await info.json()
