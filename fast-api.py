@@ -5,7 +5,7 @@ from fastapi import Request
 import urllib.request
 import os
 import json
-
+import upload
 import ocr
 
 from main import predict_vid
@@ -84,3 +84,5 @@ async def ocr_result(info : Request):
     except Exception as e:
         print(e)
         return {"error":e}
+
+

@@ -1,4 +1,5 @@
 # import the necessary packages
+from tabnanny import filename_only
 import time
 import base64
 import os
@@ -17,8 +18,9 @@ import matplotlib.pyplot as plt
 import pandas
 from scipy.optimize import curve_fit
 import numpy as np
+import uuid
 
-
+import upload
 
 def createLineIterator(P1, P2, img):
     """
@@ -480,22 +482,23 @@ def predict_vid(vid):
     plt.savefig('saved_figure.jpg')
 
 
-    file = 'saved_figure.jpg'
-    image = open(file, 'rb')
-    image_read = image.read()
-    image_64_encode = base64.encodebytes(image_read)
+    
+    # image = open(file, 'rb')
+    # image_read = image.read()
+    # image_64_encode = base64.encodebytes(image_read)
+    up_str = upload.upload_img('saved_figure.jpg')
     
     if os.path.exists('saved_figure.jpg'):
         os.remove('saved_figure.jpg') # one file at a time
 
     if ((averageFixationLengthMS > 200) and (averageFixationLengthMS < 325)):
         print('YOU ARE PROBABLY NOT DYSLEXIC')
-        return {"result": 'PROBABLY NOT DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":str(image_64_encode)}
+        return {"result": 'PROBABLY NOT DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":up_str}
     if ((averageFixationLengthMS >= 325) and (averageFixationLengthMS <= 370)):
         print('YOU ARE PROBABLY DYSLEXIC')
-        return {"result": 'PROBABLY DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":str(image_64_encode)}
+        return {"result": 'PROBABLY DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":up_str}
     if((averageFixationLengthMS > 370)):
-        return {"result": 'High noise in video',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":str(image_64_encode)}
+        return {"result": 'High noise in video',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":up_str}
 
 
 
