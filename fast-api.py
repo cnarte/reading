@@ -1,4 +1,5 @@
 from unittest import result
+import uuid
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
@@ -7,6 +8,10 @@ import os
 import json
 import upload
 import ocr
+
+from ast import arg
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from main import predict_vid
 app = FastAPI()
@@ -26,11 +31,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+sched  = BackgroundScheduler()
+
+from datetime import datetime
+
+def datetime_to_cron(dt):
+  # FYI: not all cron implementations accept the final parameter (year)
+  return f"cron({dt.minute} {dt.hour} {dt.day} {dt.month} ? {dt.year})"
 
 @app.get("/")
 async def main():
     return {"message": "Hello World"}
 
+from datetime import datetime, timedelta
 
 @app.post("/reading_test")
 async def reading(info : Request):
@@ -43,10 +56,18 @@ async def reading(info : Request):
         
         urllib.request.urlretrieve(link, 'video_name.mp4') 
         
-        res = predict_vid('video_name.mp4')
+
+        sched  = BackgroundScheduler()
+        x = datetime.now() #+ timedelta(minutes=3)
+        x += timedelta(minutes=10)
+        datetime_ = x
+        sched.add_job(predict_vid,'cron',day = x.day,hour=x.hour,minute=x.minute,month=x.month,year=x.year,args=['video_name.mp4',uid],coalesce=False)
+        # res = predict_vid('video_name.mp4')
         
-        with open("results/"+uid+'.json', 'w') as fp:
-            json.dump(res, fp)
+        sched.print_jobs()
+        sched.start()
+        # with open("results/"+uid+'.json', 'w') as fp:
+        #     json.dump(res, fp)
         if os.path.exists('video_name.mp4'):
             os.remove('video_name.mp4') # one file at a time
         return {"message": "success", "link_recived":link}
@@ -54,13 +75,13 @@ async def reading(info : Request):
         print("problem", e)
         return {"message": "Please check vedio again"}
 
-@app.get("/reading_test_result")
-async def reading_result(info : Request):
+@app.get("/reading_test_result/{uuid_}")
+async def reading_result(uuid_ : int ,info : Request):
     try:
-        id = await info.json()
-        uid = dict(id)["uuid"]
+        # id = await info.json()
+        uid = uuid_#dict(id)["uuid"]
         dirs =  os.listdir("results")
-        path = uid+".json"
+        path = str(uid)+".json"
         # dirs = [x.split(".")[0] for x in dirs]
         print(dirs)
         if(path in dirs):

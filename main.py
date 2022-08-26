@@ -3,6 +3,7 @@ from tabnanny import filename_only
 import time
 import base64
 import os
+import json
 
 from imutils.video import VideoStream
 from imutils import face_utils
@@ -116,7 +117,7 @@ def eyeCenterCoordinates(filePath):  # reads eye Center coordinates from Data Fi
 
 
 
-def predict_vid(vid):
+def predict_vid(vid,uid):
     # initialize dlib's face detector (HOG-based) and then create the facial landmark predictor
     print("[INFO] loading facial landmark predictor...")
     detector = dlib.get_frontal_face_detector()
@@ -493,13 +494,15 @@ def predict_vid(vid):
 
     if ((averageFixationLengthMS > 200) and (averageFixationLengthMS < 325)):
         print('YOU ARE PROBABLY NOT DYSLEXIC')
-        return {"result": 'PROBABLY NOT DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":up_str}
+        res= {"result": 'PROBABLY NOT DYSLEXIC',"averageFixationLengthMS":averageFixationLengthMS,"image":up_str}
     if ((averageFixationLengthMS >= 325) and (averageFixationLengthMS <= 370)):
         print('YOU ARE PROBABLY DYSLEXIC')
-        return {"result": 'PROBABLY DYSLEXIC',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":up_str}
+        res =  {"result": 'PROBABLY DYSLEXIC',"averageFixationLengthMS":averageFixationLengthMS,"image":up_str}
     if((averageFixationLengthMS > 370)):
-        return {"result": 'High noise in video',"averageFixationLengthMS":averageFixationLengthFRAMES,"image":up_str}
-
+        res =  {"result": 'High noise in video',"averageFixationLengthMS":averageFixationLengthMS,"image":up_str}
+    
+    with open("results/"+uid+'.json', 'w') as fp:
+            json.dump(res, fp)
 
 
 
