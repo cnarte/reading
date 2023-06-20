@@ -9,10 +9,6 @@ Saathi (No Child Left Behind) is a machine learning project that emerged as the 
 - [Introduction](#introduction)
 - [Key Features](#key-features)
 - [Demo Video](#demo-video)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
